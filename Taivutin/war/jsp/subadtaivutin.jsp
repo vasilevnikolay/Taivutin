@@ -8,10 +8,15 @@
 <title>Adjektiivi/Substantiivi-taivutin</title>
 </head>
 <body>
-<form action="taivutin" method="POST"> 
-	Syötä substantiivi/adjektiivi perusmuodossa:  
-	<input type="text" name="word" id="word"/> <br/>
-    <input type="submit", value="Taivuta"/>    		
-		</form>
+	<form action="taivutin" method="POST"> 
+		Syötä substantiivi/adjektiivi perusmuodossa:  
+		<input type="text" name="word" id="word"/> <br/>
+		<p style="color:red">${error}</p>
+	    <input type="submit", value="Taivuta"/>    		
+	</form>
+	
+	<p>${partitive}</p>
+        
+    <a href="index.html">Takaisin</a>
 </body>
 </html>
