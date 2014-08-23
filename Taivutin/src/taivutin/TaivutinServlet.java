@@ -1,8 +1,24 @@
 package taivutin;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+//import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.apache.commons.io.IOUtils;
+//import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+//import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.HttpEntity;
+//import org.apache.http.HttpResponse;
+//import org.apache.http.NameValuePair;
 
 import javax.servlet.http.*;
 import javax.servlet.ServletException;
@@ -22,8 +38,52 @@ public class TaivutinServlet extends HttpServlet {
 		
 		resp.setContentType("text/html;charset=UTF-8");
 		String word = req.getParameter("word");
-		//System.out.println("here");
-		//System.out.println(Character.isLetter('ö'));
+		
+		//first query if exception
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		HttpGet httpget = new HttpGet("http://vasilev.users.cs.helsinki.fi/lookup.php");
+		
+		URI uri;
+		//request parameters and other entities
+		try {
+			uri = new URIBuilder()
+					.setScheme("http")
+					.setHost("vasilev.users.cs.helsinki.fi")
+					.setPath("/lookup.php")
+					.setParameter("word", word)
+					.build();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+		httpget = new HttpGet(uri);
+		System.out.println(httpget.getURI());
+		
+		CloseableHttpResponse response = httpclient.execute(httpget);
+		HttpEntity entity = response.getEntity();
+		
+		if(entity != null){
+			InputStream instream = entity.getContent();
+			try{
+				String responseContent = IOUtils.toString(instream, "UTF-8");
+				System.out.println("success");
+				System.out.println(responseContent);
+				System.out.println(responseContent.length());
+				word = responseContent.substring(14);
+				word = word.trim();
+				System.out.println(word.length());
+				
+				req.setAttribute("partitive", responseContent);
+				
+				req.getRequestDispatcher("/jsp/subadtaivutin.jsp").forward(req, resp);
+				return;
+			}
+			finally {
+				System.out.println("oli tyhjä");
+				instream.close();
+			}
+		}
 		
 		if (word.length() == 0 || !isAlpha(word)){
 			req.setAttribute("error", "Tuo kai ei taivu...");
