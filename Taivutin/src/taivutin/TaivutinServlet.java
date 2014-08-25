@@ -73,8 +73,6 @@ public class TaivutinServlet extends HttpServlet {
 				return false;
 		
 		return true;
-		
-		//return word.matches("[a-zA-Z\00C4\00D6\00E4\00F6]+");
 	}
 	
 	private static boolean isFront(String word){
@@ -93,24 +91,30 @@ public class TaivutinServlet extends HttpServlet {
 	}
 	
 	private static String declineInPartitive(String word){
-		
+		int wordLength = word.length();
+		//if word ends in -nen, use follow -nen pattern
+		if(wordLength > 3 && word.substring(wordLength-3, wordLength).equalsIgnoreCase("nen")){
+			if(isFront(word))
+				return word.substring(0, wordLength - 3) + "s" + "tä";
+			return word.substring(0, wordLength - 3) + "s" + "ta";
+		}
 		//if last letter consonant, return ta/tä
-		if(!vowels.contains(word.charAt(word.length()-1))){
+		if(!vowels.contains(word.charAt(wordLength-1))){
 			if(isFront(word))
 				return word + "tä";
 			return word + "ta";
 		}
 		
-		if((!vowels.contains(word.charAt(word.length()-2)) && word.charAt(word.length()-1) != 'e') ||
-		   word.substring(word.length()-2, word.length()).equalsIgnoreCase("ia") || 
-		   word.substring(word.length()-2, word.length()).equalsIgnoreCase("iä") ||
-		   word.substring(word.length()-2, word.length()).equalsIgnoreCase("ea") ||
-		   word.substring(word.length()-2, word.length()).equalsIgnoreCase("eä")){
+		if((!vowels.contains(word.charAt(wordLength-2)) && word.charAt(wordLength-1) != 'e') ||
+		   word.substring(wordLength-2, wordLength).equalsIgnoreCase("ia") || 
+		   word.substring(wordLength-2, wordLength).equalsIgnoreCase("iä") ||
+		   word.substring(wordLength-2, wordLength).equalsIgnoreCase("ea") ||
+		   word.substring(wordLength-2, wordLength).equalsIgnoreCase("eä")){
 			if(isFront(word))
 				return word + "ä";
 			return word + "a";
 		}
-		if(vowels.contains(word.charAt(word.length()-2))){
+		if(vowels.contains(word.charAt(wordLength-2))){
 			if(isFront(word))
 				return word + "tä";
 			return word + "ta";
